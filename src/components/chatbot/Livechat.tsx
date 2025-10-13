@@ -643,7 +643,7 @@ export const Livechat: React.FC<LivechatProps> = ({
                   </div>
 
                   {/* Sticky input only on welcome */}
-                  <div className="sticky bottom-0 mt-6 border-t border-[#e2e2e2] bg-white">
+                 {/*  <div className="sticky bottom-0 mt-6 border-t border-[#e2e2e2] bg-white">
                     <div className="flex items-center gap-3 p-3 sm:p-4 rounded-lg">
                       <Input
                         value={userInput}
@@ -668,7 +668,7 @@ export const Livechat: React.FC<LivechatProps> = ({
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               ) : currentView === "conversation" ? (
                 <div className="flex-1 min-h-0 flex flex-col h-full">
