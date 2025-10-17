@@ -22,7 +22,7 @@ import StaticLeadFields, {
 } from "@/components/dynamic-form/StaticLeadFields";
 import { submitLead, type LeadSubmitPayload } from "@/components/lead/LeadSubmit";
 import { JALDEE_BASE_URL, JALDEE_AUTH_TOKEN } from "@/lib/env";
-import { injectLeadFormSkin, injectLeadFormSkinIntoRoot } from "@/sdk/styles/injectFormSkin";
+import { injectLeadFormSkin } from "@/sdk/styles/injectFormSkin";
 
 /** ---------- lightweight types for the S3 JSON ---------- */
 type LeadSdkAction = {
@@ -68,7 +68,6 @@ interface ChatbotConfig {
   greeting: string;
   subtitle: string;
   avatar: string;
-  quickActions: unknown[];
   conversations: Record<string, Conversation>;
   theme: {
     primaryColor: string;
@@ -236,18 +235,18 @@ export const Livechat: React.FC<LivechatProps> = ({
   // form + skin injection
   const formRef = useRef<HTMLFormElement | null>(null);
   useEffect(() => {
-    const node = formRef.current;
-    if (!node) {
-      injectLeadFormSkin();
-      return;
-    }
-    const rootNode: Node = node.getRootNode();
-    if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-      injectLeadFormSkinIntoRoot(rootNode);
-    } else {
-      injectLeadFormSkin();
-    }
-  }, [isOpen, currentView]);
+  const node = formRef.current;
+  if (!node) {
+    injectLeadFormSkin(config?.theme);
+    return;
+  }
+  const rootNode: Node = node.getRootNode();
+  if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+    injectLeadFormSkin(config?.theme, rootNode);
+  } else {
+    injectLeadFormSkin(config?.theme);
+  }
+}, [isOpen, currentView, config]);
 
   const startTimeoutRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
@@ -368,6 +367,7 @@ export const Livechat: React.FC<LivechatProps> = ({
       content: conversation.message,
       timestamp: new Date(),
       options: conversation.options,
+
     };
     setMessages([botMessage]);
     setCurrentView("conversation");
@@ -475,6 +475,8 @@ export const Livechat: React.FC<LivechatProps> = ({
   };
 
   if (loading || !config) return null;
+const primary = config.theme.primaryColor;
+const secondary = config.theme.secondaryColor;
 
   const dockMobile =
     config.theme.position === "bottom-right"
@@ -496,21 +498,21 @@ export const Livechat: React.FC<LivechatProps> = ({
     "transition-opacity duration-300 ease-out opacity-0 animate-fade-in [--animation-delay:200ms]";
 
   return (
-    <div className={`fixed ${positionClasses} z-50 ${className}`}>
+    <div className={`fixed ${positionClasses} z-101 ${className}`} style={{zIndex:101}} >
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
           className="h-16 w-16 rounded-full hover:scale-110 shadow-lg transition-all duration-300 border-0 animate-bounce"
           size="icon"
         >
-          <img src="/Ellipse 2.svg" alt="Chat bot avatar" className="h-16 w-16" />
+          <img src="/logo.svg" alt="Chat bot avatar" className="h-16 w-16" />
         </Button>
       )}
 
       {isOpen && !isMinimized && (
         <div
           className="
-            bg-[linear-gradient(90deg,rgba(131,80,242,1)_20%,rgba(61,125,243,1)_80%)]
+            
             w-[100dvw] h-[calc(100dvh-2rem)]
             sm:w-[32vw] sm:min-w-[380px] sm:max-w-[520px]
             sm:h-[calc(100dvh-4rem)] sm:max-h-[calc(100dvh-4rem)]
@@ -519,6 +521,10 @@ export const Livechat: React.FC<LivechatProps> = ({
             flex flex-col px-1 py-1 sm:px-1 sm:py-2 gap-1 sm:gap-2
             min-h-0
           "
+          style={{
+                background: `linear-gradient(90deg, ${primary} 20%, ${secondary} 80%)`,
+              }}
+
         >
           {/* Header */}
           {!isCompact ? (
@@ -526,7 +532,7 @@ export const Livechat: React.FC<LivechatProps> = ({
               <div className="mb-2 flex items-center w-full max-w-full">
                 <div className="mx-auto">
                   <Avatar className="w-[56px] h-[56px] sm:w-[72px] sm:h-[72px]">
-                    <AvatarImage src="/Ellipse 2.svg" alt="Chat bot avatar" />
+                    <AvatarImage src="/logo.svg" alt="Chat bot avatar" />
                     <AvatarFallback>🤖</AvatarFallback>
                   </Avatar>
                 </div>
@@ -535,7 +541,17 @@ export const Livechat: React.FC<LivechatProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsMinimized(true)}
-                    className="w-9 h-9 sm:w-[41px] sm:h-[41px] bg-[#6090ff] rounded-full hover:bg-[#5080ef]"
+                    className="w-9 h-9 sm:w-[41px] sm:h-[41px] rounded-full"
+                    style={{
+                      background: config.theme.secondaryColor,
+                      filter: 'brightness(75%)',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = config.theme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = config.theme.secondaryColor;
+                    }}
                   >
                     <MinusIcon className="w-4 h-4 text-white" />
                   </Button>
@@ -543,7 +559,17 @@ export const Livechat: React.FC<LivechatProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsOpen(false)}
-                    className="w-9 h-9 sm:w-[41px] sm:h-[41px] bg-[#6090ff] rounded-full hover:bg-[#5080ef]"
+                    className="w-9 h-9 sm:w-[41px] sm:h-[41px] rounded-full"
+                    style={{
+                      background: config.theme.secondaryColor,
+                      filter: 'brightness(75%)'
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = config.theme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = config.theme.secondaryColor;
+                    }}
                   >
                     <X className="w-4 h-4 text-white" />
                   </Button>
@@ -552,7 +578,8 @@ export const Livechat: React.FC<LivechatProps> = ({
               <h1 className="font-semibold text-white text-[clamp(18px,2vw,24px)] text-center leading-tight mb-2">
                 {config.greeting}
               </h1>
-              <p className="font-normal text-[#b7c3ff] text-[clamp(13px,1.6vw,16px)] text-center leading-snug mb-3">
+              <p className="font-normal text-[#e3d2c1] text-[clamp(13px,1.6vw,16px)] text-center leading-snug mb-3"
+              >
                 {config.subtitle}
               </p>
             </div>
@@ -560,7 +587,7 @@ export const Livechat: React.FC<LivechatProps> = ({
             <div className={`px-4 sm:px-6 ${headerPadTop} ${headerClsBase}`}>
               <div className="relative flex items-center gap-3 sm:gap-4">
                 <Avatar className="w-12 h-12 sm:w-[56px] sm:h-[56px] shrink-0">
-                  <AvatarImage src="/Ellipse 2.svg" alt="Chat bot avatar" />
+                  <AvatarImage src="/logo.svg" alt="Chat bot avatar" />
                   <AvatarFallback>🤖</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
@@ -576,7 +603,17 @@ export const Livechat: React.FC<LivechatProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsMinimized(true)}
-                    className="w-9 h-9 bg-[#6090ff] rounded-full hover:bg-[#5080ef]"
+                    className="w-9 h-9 rounded-full"
+                      style={{
+                        backgroundColor: config.theme.secondaryColor,
+                        filter: 'brightness(75%)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor=config.theme.primaryColor;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = config.theme.secondaryColor;
+                      }}
                   >
                     <MinusIcon className="w-4 h-4 text-white" />
                   </Button>
@@ -584,7 +621,17 @@ export const Livechat: React.FC<LivechatProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsOpen(false)}
-                    className="w-9 h-9 bg-[#6090ff] rounded-full hover:bg-[#5080ef]"
+                    className="w-9 h-9 rounded-full"
+                      style={{
+                        backgroundColor: config.theme.secondaryColor,
+                        filter: 'brightness(75%)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor=config.theme.primaryColor;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = config.theme.secondaryColor;
+                      }}
                   >
                     <X className="w-4 h-4 text-white" />
                   </Button>
@@ -606,7 +653,7 @@ export const Livechat: React.FC<LivechatProps> = ({
 
                   <div className="flex items-start gap-3 sm:gap-3 mb-4 sm:mb-6">
                     <Avatar className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0">
-                      <AvatarImage src="/Ellipse 2.svg" alt="Bot avatar" />
+                      <AvatarImage src="/logo.svg" alt="Bot avatar" />
                       <AvatarFallback>🤖</AvatarFallback>
                     </Avatar>
                     <div className="bg-[#f2f2f2] rounded-[16px_16px_18.94px_2.1px] p-3 sm:p-4 max-w-[85%] sm:max-w-[22rem]">
@@ -626,13 +673,17 @@ export const Livechat: React.FC<LivechatProps> = ({
                         className="w-auto min-w-[9rem] sm:min-w-0 px-4 h-[42px] bg-white rounded-[24.1px] border-[0.96px] border-transparent hover:shadow-md transition-all duration-200 hover:scale-105"
                         style={{
                           background: "white",
-                          backgroundImage:
-                            "linear-gradient(white, white), linear-gradient(90deg, rgba(131,80,242,1) 20%, rgba(61,125,243,1) 80%)",
+                          backgroundImage: `linear-gradient(white, white), linear-gradient(90deg, ${config.theme.primaryColor} 20%, ${config.theme.secondaryColor} 80%)`,
                           backgroundOrigin: "border-box",
                           backgroundClip: "padding-box, border-box",
                         } as React.CSSProperties}
                       >
-                        <span className="bg-[linear-gradient(90deg,rgba(131,80,242,1)_20%,rgba(61,125,243,1)_80%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] font-medium text-[clamp(13px,1.4vw,15.4px)] leading-[22px] whitespace-nowrap">
+                        <span style={{
+                              background: `linear-gradient(90deg, ${primary} 20%, ${secondary} 80%)`,
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }}
+                           className=" [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] font-medium text-[clamp(13px,1.4vw,15.4px)] leading-[22px] whitespace-nowrap">
                           {a.title}
                         </span>
                       </Button>
@@ -662,7 +713,9 @@ export const Livechat: React.FC<LivechatProps> = ({
                         <Button
                           onClick={handleSendMessage}
                           size="icon"
-                          className="w-11 h-11 sm:w-[51px] sm:h-[51px] bg-gradient-to-r from-[rgba(131,80,242,1)] to-[rgba(61,125,243,1)] hover:opacity-90 transition-opacity rounded-full"
+                          className="w-11 h-11 sm:w-[51px] sm:h-[51px]  hover:opacity-90 transition-opacity rounded-full"
+                          style={{
+                          background: `linear-gradient(90deg, ${primary} 20%, ${secondary} 80%)`,}}
                         >
                           <SendIcon className="w-5 h-5 text-white" />
                         </Button>
@@ -683,11 +736,16 @@ export const Livechat: React.FC<LivechatProps> = ({
                         className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[85%] sm:max-w-[75%] p-3 sm:p-4 ${
-                            message.type === "user"
-                              ? "bg-[linear-gradient(90deg,rgba(131,80,242,1)_20%,rgba(61,125,243,1)_80%)] text-white rounded-[16px_16px_2px_16px]"
-                              : "bg-[#f2f2f2] text-[#272727] rounded-[16px_16px_18.94px_2.1px]"
-                          }`}
+                          className={`max-w-[85%] sm:max-w-[75%] p-3 sm:p-4 rounded-[16px_16px_2px_16px] ${
+                              message.type === "bot" ? "text-[#272727] rounded-[16px_16px_18.94px_2.1px]" : "text-white"
+                            }`}
+                            style={
+                              message.type === "user"
+                                ? {
+                                    backgroundImage: `linear-gradient(90deg, ${config.theme.primaryColor} 20%, ${config.theme.secondaryColor} 80%)`,
+                                  }
+                                : { backgroundColor: "#f2f2f2" }
+                            }
                         >
                           <p className="text-[clamp(13px,1.4vw,14px)] sm:text-sm leading-[21px] sm:leading-[23px]">
                             {message.content}
@@ -698,7 +756,21 @@ export const Livechat: React.FC<LivechatProps> = ({
                                 <button
                                   key={option.id}
                                   onClick={() => handleOptionClick(option)}
-                                  className="w-full text-left p-2 text-sm border border-[#e2e2e2] rounded hover:bg-[linear-gradient(90deg,rgba(131,80,242,1)_20%,rgba(61,125,243,1)_80%)] hover:text-white transition-colors flex items-center justify-between group"
+                                    className="w-full text-left p-2 text-sm border border-[#e2e2e2] rounded transition-colors flex items-center justify-between group"
+                                      style={{
+                                        // hover effect
+                                        background: "transparent",
+                                        transition: "all 0.2s",
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        (e.currentTarget as HTMLButtonElement).style.backgroundImage = 
+                                          `linear-gradient(90deg, ${config.theme.primaryColor} 20%, ${config.theme.secondaryColor} 80%)`;
+                                        (e.currentTarget as HTMLButtonElement).style.color = "white";
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        (e.currentTarget as HTMLButtonElement).style.backgroundImage = "";
+                                        (e.currentTarget as HTMLButtonElement).style.color = "";
+                                      }}
                                 >
                                   {option.label}
                                   <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
@@ -713,7 +785,17 @@ export const Livechat: React.FC<LivechatProps> = ({
 
                   <button
                     onClick={resetChat}
-                    className="w-full mt-2 mb-2 sm:mb-4 text-xs text-[#667084] hover:text-[rgba(131,80,242,1)] transition-colors"
+                    className="w-full mt-2 mb-2 sm:mb-4 text-xs transition-colors"
+                    style={{
+                      color: '#667084', 
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color = config.theme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color = '#667084';
+                    }}
+
                   >
                     Start new conversation
                   </button>
@@ -727,7 +809,16 @@ export const Livechat: React.FC<LivechatProps> = ({
                     </h3>
                     <button
                       onClick={() => { setCurrentView("welcome"); setFlowMode("idle"); }}
-                      className="text-xs text-[#667084] hover:text-[rgba(131,80,242,1)] transition-colors"
+                      className="text-xs transition-colors"
+                      style={{
+                        color: "#667084",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = config.theme.primaryColor;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.color = "#667084";
+                      }}
                     >
                       ‹ Back
                     </button>
@@ -760,7 +851,7 @@ export const Livechat: React.FC<LivechatProps> = ({
                         {
                           id: Date.now().toString(),
                           type: "user",
-                          content: `Submitted ${formTitle || "request"}`,
+                          content: `Submitted`,
                           timestamp: new Date(),
                         },
                       ]);
@@ -855,7 +946,10 @@ export const Livechat: React.FC<LivechatProps> = ({
                     <div className="rounded-xl border border-[#e2e2e2] bg-white p-3">
                       <Button
                         type="button"
-                        className="w-full h-[44px] rounded-full bg-gradient-to-r from-[rgba(131,80,242,1)] to-[rgba(61,125,243,1)] hover:opacity-90"
+                        className="w-full h-[44px] rounded-full hover:opacity-90"
+                        style={{
+                          backgroundImage: `linear-gradient(90deg, ${config.theme.primaryColor} 20%, ${config.theme.secondaryColor} 80%)`,
+                        }}
                         onClick={() => formRef.current?.requestSubmit()}
                       >
                         <span className="text-white font-medium">Submit</span>
@@ -865,7 +959,17 @@ export const Livechat: React.FC<LivechatProps> = ({
 
                   <button
                     onClick={resetChat}
-                    className="w-full mt-2 mb-2 sm:mb-4 text-xs text-[#667084] hover:text-[rgba(131,80,242,1)] transition-colors"
+                    className="w-full mt-2 mb-2 sm:mb-4 text-xs transition-colors"
+                    style={{
+                      color: '#667084', 
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color = config.theme.primaryColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color = '#667084';
+                    }}
+
                   >
                     Start new conversation
                   </button>
@@ -878,8 +982,11 @@ export const Livechat: React.FC<LivechatProps> = ({
 
       {isOpen && isMinimized && (
         <div
-          className="
-            bg-[linear-gradient(90deg,rgba(131,80,242,1)_20%,rgba(61,125,243,1)_80%)]
+        style={{
+                background: `linear-gradient(90deg, ${primary} 20%, ${secondary} 80%)`,
+              }}
+  
+        className="
             p-4 rounded-t-2xl min-w=[300px]
             max-[639px]:p-3
             max-[639px]:rounded-full
@@ -891,7 +998,7 @@ export const Livechat: React.FC<LivechatProps> = ({
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center space-x-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src="/Ellipse 2.svg" />
+                <AvatarImage src="/logo.svg" />
                 <AvatarFallback>🤖</AvatarFallback>
               </Avatar>
               <div>

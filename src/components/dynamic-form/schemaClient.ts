@@ -27,15 +27,28 @@ export type LeadSdkJson = {
   actions: LeadSdkAction[];
 };
 
+// Type for chatbot-configs.json
+type ChatbotConfig = {
+  id: string;
+  name: string;
+  greeting: string;
+  subtitle: string;
+  avatar: string;
+  LEAD_SDK_ACCOUNT_ID: string;
+  theme: {
+    primaryColor: string;
+    secondaryColor: string;
+    position: string;
+  };
+};
+
 // -------- Config --------
-// If you want to move these to src/lib/env.ts, feel free.
 const UIS3_BASE = "https://jaldeeuiscale.s3.ap-south-1.amazonaws.com";
-// TODO: make this configurable if needed; matches your current setup
-const LEAD_SDK_ACCOUNT_ID = 155523;
 
 // -------- Internal cache (retained for widget lifetime) --------
 let cachedLeadSdk: LeadSdkJson | null = null;
 let inflight: Promise<LeadSdkJson> | null = null;
+let cachedConfig: ChatbotConfig | null = null;
 
 /**
  * Clear the in-memory cache (e.g., if you want to force refresh after a settings change).
@@ -43,6 +56,23 @@ let inflight: Promise<LeadSdkJson> | null = null;
 export function clearLeadSdkCache() {
   cachedLeadSdk = null;
   inflight = null;
+  cachedConfig = null;
+}
+
+/**
+ * Fetch chatbot config from public/chatbot-configs.json
+ */
+export async function getChatbotConfig(): Promise<ChatbotConfig> {
+  if (cachedConfig) return cachedConfig;
+
+  const res = await fetch("/chatbot-configs.json");
+  if (!res.ok) throw new Error(`Failed to load chatbot-configs.json: ${res.statusText}`);
+  const json = await res.json();
+
+  // Assuming you want the "default" config
+  const config: ChatbotConfig = json.default;
+  cachedConfig = config;
+  return config;
 }
 
 /**
@@ -77,7 +107,9 @@ export async function getLeadSdkJson(uniqueId?: string, signal?: AbortSignal): P
   if (cachedLeadSdk) return cachedLeadSdk;
   if (inflight) return inflight;
 
-  // Build S3 path. If you later want per-tenant paths, swap LEAD_SDK_ACCOUNT_ID.
+  const config = await getChatbotConfig();
+  const LEAD_SDK_ACCOUNT_ID = config.LEAD_SDK_ACCOUNT_ID;
+
   const url = `${UIS3_BASE}/${encodeURIComponent(LEAD_SDK_ACCOUNT_ID)}/lead-sdk.json`;
 
   inflight = getLeadSdkJsonByUrl(url, signal)
