@@ -181,27 +181,37 @@ function removeFields(s: DynamicFormSchema, toRemove: string[] = []): DynamicFor
   };
 }
 
+const getTemplateSchemaByEncodedUid = (actions, targetEncodedUid) => {
+  if (!Array.isArray(actions)) return null;
+
+  const matchedAction = actions.find(
+    (action) => action.channel?.encodedUid === targetEncodedUid
+  );
+
+  return matchedAction?.template?.templateSchema || null;
+};
+
 /** Fetch template schema by channel encoded UID (GET) */
-async function getTemplateByChannelEncUid(channelEncUid: string, signal?: AbortSignal) {
-  const url = `${JALDEE_BASE_URL.replace(/\/$/, "")}/v1/rest/consumer/crm/lead/template/channel/${encodeURIComponent(
-    channelEncUid
-  )}`;
-  const res = await fetch(url, {
-    method: "GET",
-    signal,
-    headers: {
-      Accept: "application/json",
-      ...(JALDEE_AUTH_TOKEN ? { Authorization: `Bearer ${JALDEE_AUTH_TOKEN}` } : {}),
-    },
-    credentials: "include",
-    mode: "cors",
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Template fetch failed (${res.status}): ${text || res.statusText}`);
-  }
-  return res.json(); // raw server schema
-}
+// async function getTemplateByChannelEncUid(channelEncUid: string, signal?: AbortSignal) {
+//   // const url = `${JALDEE_BASE_URL.replace(/\/$/, "")}/v1/rest/consumer/crm/lead/template/channel/${encodeURIComponent(
+//   //   channelEncUid
+//   // )}`;
+//   // const res = await fetch(url, {
+//   //   method: "GET",
+//   //   signal,
+//   //   headers: {
+//   //     Accept: "application/json",
+//   //     ...(JALDEE_AUTH_TOKEN ? { Authorization: `Bearer ${JALDEE_AUTH_TOKEN}` } : {}),
+//   //   },
+//   //   credentials: "include",
+//   //   mode: "cors",
+//   // });
+//   // if (!res.ok) {
+//     // const text = await res.text().catch(() => "");
+//     // throw new Error(`Template fetch failed (${res.status}): ${text || res.statusText}`);
+//   // }
+//   return res.json(); // raw server schema
+// }
 
 export const Livechat: React.FC<LivechatProps> = ({
   configId = "default",
@@ -427,11 +437,16 @@ export const Livechat: React.FC<LivechatProps> = ({
     setFormSchema(null);
     setFormLoading(true);
 
-    const controller = new AbortController();
+    // const controller = new AbortController();
     (async () => {
       try {
         // Per requirement: always fetch by channel on click (even if JSON already has a schema)
-        const raw = await getTemplateByChannelEncUid(action.channel.encodedUid, controller.signal);
+        let sdkJson = await getLeadSdkJson();
+        console.log("SDK JSON:", sdkJson);
+        
+        const raw = await getTemplateSchemaByEncodedUid(sdkJson?.actions, action.channel.encodedUid);
+        console.log("SDK Template:", raw);
+        
         const schemaNode =
         typeof raw === "object" && raw !== null && "templateSchema" in raw
           ? (raw as { templateSchema: unknown }).templateSchema

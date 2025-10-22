@@ -1,5 +1,7 @@
 // src/components/dynamic-form/schemaClient.ts
 
+import { CONFIG } from "./constants";
+
 // Minimal types for the S3 JSON (adjust as needed in your project)
 export type LeadSdkAction = {
   id: string;
@@ -43,7 +45,7 @@ type ChatbotConfig = {
 };
 
 // -------- Config --------
-const UIS3_BASE = "https://jaldeeuiscale.s3.ap-south-1.amazonaws.com";
+const UIS3_BASE = CONFIG.S3PATH;
 
 // -------- Internal cache (retained for widget lifetime) --------
 let cachedLeadSdk: LeadSdkJson | null = null;

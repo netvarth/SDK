@@ -1,3 +1,5 @@
+import { CONFIG } from "../dynamic-form/constants";
+
 // src/components/lead/LeadSubmit.ts
 export interface LeadSubmitPayload {
   channelEncUid: string;
@@ -30,7 +32,7 @@ export type LeadSubmitResponse = unknown;
 export async function submitLead(
   payload: LeadSubmitPayload,
   {
-    baseUrl = "https://scale.jaldee.com",
+    baseUrl = CONFIG.URLPATH,
     location,
     authToken,
     timeoutMs = 15000,
