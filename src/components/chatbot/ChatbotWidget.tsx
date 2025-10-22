@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Send, ChevronRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CONFIG } from '../dynamic-form/constants';
 
 interface QuickAction {
   id: string;
@@ -67,7 +68,9 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({
 
   const loadConfig = async () => {
     try {
-      const response = await fetch('/chatbot-configs.json');
+      const base = CONFIG.S3PATH.endsWith('/') ? CONFIG.S3PATH.slice(0, -1) : CONFIG.S3PATH;
+      const url = `${base}/${CONFIG.UNIQUEID}/chatbot-configs.json`;
+      const response = await fetch(url);
       const configs = await response.json();
       const selectedConfig = configs[configId] || configs.default;
       setConfig(selectedConfig);

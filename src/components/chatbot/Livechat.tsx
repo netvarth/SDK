@@ -11,7 +11,6 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import DynamicForm from "@/components/dynamic-form/DynamicForm";
 import type { DynamicFormSchema, SimpleField } from "@/components/dynamic-form/types";
 import { getLeadSdkJson } from "@/components/dynamic-form/schemaClient";
@@ -23,6 +22,7 @@ import StaticLeadFields, {
 import { submitLead, type LeadSubmitPayload } from "@/components/lead/LeadSubmit";
 import { JALDEE_BASE_URL, JALDEE_AUTH_TOKEN } from "@/lib/env";
 import { injectLeadFormSkin } from "@/sdk/styles/injectFormSkin";
+import { CONFIG } from "../dynamic-form/constants";
 
 /** ---------- lightweight types for the S3 JSON ---------- */
 type LeadSdkAction = {
@@ -86,6 +86,8 @@ interface LivechatProps {
   configId?: string;
   className?: string;
 }
+
+const logoPath = (CONFIG.S3PATH + "/" +CONFIG.UNIQUEID + "/logo.svg");
 
 type FlowMode = "idle" | "action-conversation" | "action-form";
 
@@ -318,7 +320,9 @@ export const Livechat: React.FC<LivechatProps> = ({
     let isMounted = true;
     (async () => {
       try {
-        const response = await fetch("/chatbot-configs.json");
+          const s3Base = `${CONFIG.S3PATH}/${CONFIG.UNIQUEID}/chatbot-configs.json`;
+  console.log("Full Path:", `${s3Base}/${CONFIG.UNIQUEID}/chatbot-configs.json`);
+  const response = await fetch(s3Base);
         const configs = await response.json();
         const selectedConfig = configs[configId] || configs.default;
         if (isMounted) {
@@ -520,7 +524,7 @@ const secondary = config.theme.secondaryColor;
           className="h-16 w-16 rounded-full hover:scale-110 shadow-lg transition-all duration-300 border-0 animate-bounce"
           size="icon"
         >
-          <img src="/logo.svg" alt="Chat bot avatar" className="h-16 w-16" />
+          <img src={logoPath} alt="Chat bot avatar" className="h-16 w-16" />
         </Button>
       )}
 
@@ -547,7 +551,7 @@ const secondary = config.theme.secondaryColor;
               <div className="mb-2 flex items-center w-full max-w-full">
                 <div className="mx-auto">
                   <Avatar className="w-[56px] h-[56px] sm:w-[72px] sm:h-[72px]">
-                    <AvatarImage src="/logo.svg" alt="Chat bot avatar" />
+                    <AvatarImage src={logoPath} alt="Chat bot avatar" />
                     <AvatarFallback>🤖</AvatarFallback>
                   </Avatar>
                 </div>
@@ -602,7 +606,7 @@ const secondary = config.theme.secondaryColor;
             <div className={`px-4 sm:px-6 ${headerPadTop} ${headerClsBase}`}>
               <div className="relative flex items-center gap-3 sm:gap-4">
                 <Avatar className="w-12 h-12 sm:w-[56px] sm:h-[56px] shrink-0">
-                  <AvatarImage src="/logo.svg" alt="Chat bot avatar" />
+                  <AvatarImage src={logoPath} alt="Chat bot avatar" />
                   <AvatarFallback>🤖</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
@@ -668,7 +672,7 @@ const secondary = config.theme.secondaryColor;
 
                   <div className="flex items-start gap-3 sm:gap-3 mb-4 sm:mb-6">
                     <Avatar className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0">
-                      <AvatarImage src="/logo.svg" alt="Bot avatar" />
+                      <AvatarImage src={logoPath} alt="Bot avatar" />
                       <AvatarFallback>🤖</AvatarFallback>
                     </Avatar>
                     <div className="bg-[#f2f2f2] rounded-[16px_16px_18.94px_2.1px] p-3 sm:p-4 max-w-[85%] sm:max-w-[22rem]">
@@ -1013,7 +1017,7 @@ const secondary = config.theme.secondaryColor;
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center space-x-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src="/logo.svg" />
+                <AvatarImage src={logoPath} />
                 <AvatarFallback>🤖</AvatarFallback>
               </Avatar>
               <div>

@@ -23,5 +23,6 @@ export function getOptionsForInput(input?: string, fallback?: OptionItem[]) {
 
 export const CONFIG = {
   S3PATH: 'https://jaldeeuiscale.s3.ap-south-1.amazonaws.com',
-  URLPATH:'https://scale.jaldee.com'
+  URLPATH:'https://scale.jaldee.com',
+  UNIQUEID: '154843'
 }

@@ -67,7 +67,9 @@ export function clearLeadSdkCache() {
 export async function getChatbotConfig(): Promise<ChatbotConfig> {
   if (cachedConfig) return cachedConfig;
 
-  const res = await fetch("/chatbot-configs.json");
+  const s3Base = `${CONFIG.S3PATH}/${CONFIG.UNIQUEID}/chatbot-configs.json`;
+  console.log("Full Path:", `${s3Base}/${CONFIG.UNIQUEID}/chatbot-configs.json`);
+  const res = await fetch(s3Base);
   if (!res.ok) throw new Error(`Failed to load chatbot-configs.json: ${res.statusText}`);
   const json = await res.json();
 
@@ -110,9 +112,7 @@ export async function getLeadSdkJson(uniqueId?: string, signal?: AbortSignal): P
   if (inflight) return inflight;
 
   const config = await getChatbotConfig();
-  const LEAD_SDK_ACCOUNT_ID = config.LEAD_SDK_ACCOUNT_ID;
-
-  const url = `${UIS3_BASE}/${encodeURIComponent(LEAD_SDK_ACCOUNT_ID)}/lead-sdk.json`;
+  const url = `${UIS3_BASE}/${encodeURIComponent(CONFIG.UNIQUEID)}/lead-sdk.json`;
 
   inflight = getLeadSdkJsonByUrl(url, signal)
     .then((data) => {
