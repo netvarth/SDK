@@ -445,7 +445,7 @@ export const Livechat: React.FC<LivechatProps> = ({
     (async () => {
       try {
         // Per requirement: always fetch by channel on click (even if JSON already has a schema)
-        let sdkJson = await getLeadSdkJson();
+        const sdkJson = await getLeadSdkJson();
         console.log("SDK JSON:", sdkJson);
         
         const raw = await getTemplateSchemaByEncodedUid(sdkJson?.actions, action.channel.encodedUid);
@@ -532,9 +532,9 @@ const secondary = config.theme.secondaryColor;
         <div
           className="
             
-            w-[100dvw] h-[calc(100dvh-2rem)]
-            sm:w-[32vw] sm:min-w-[380px] sm:max-w-[520px]
-            sm:h-[calc(100dvh-4rem)] sm:max-h-[calc(100dvh-4rem)]
+            w-[100dvw] h-[100dvh]
+            sm:w-[25vw] sm:min-w-[380px] sm:max-w-[520px]
+            sm:h-[calc(100dvh-7rem)] sm:max-h-[720px]
             sm:rounded-[25px]
             relative overflow-hidden
             flex flex-col px-1 py-1 sm:px-1 sm:py-2 gap-1 sm:gap-2
