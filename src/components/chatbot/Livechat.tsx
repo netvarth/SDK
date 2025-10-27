@@ -882,7 +882,7 @@ const secondary = config.theme.secondaryColor;
 
                       try {
                         const res = await submitLead(payload, {
-                          baseUrl: JALDEE_BASE_URL,
+                          baseUrl: CONFIG.URLPATH,
                           location: selectedLocationId ?? "", // use the JSON's locationId
                           authToken: JALDEE_AUTH_TOKEN || undefined,
                           timeoutMs: 15000,
