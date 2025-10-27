@@ -5,10 +5,9 @@
     "greeting": "Hey J!",
     "subtitle": "You can ask anything About Jaldee!",
     "avatar": "🤖",
-    "LEAD_SDK_ACCOUNT_ID":"154843",
     "theme": {
-      "primaryColor": "#5e3c18",
-      "secondaryColor": "#c4915a",
+      "primaryColor": "#6B3ACD",
+      "secondaryColor": "#8857E2",
       "position": "bottom-right"
     }
     

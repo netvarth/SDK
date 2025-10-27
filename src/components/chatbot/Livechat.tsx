@@ -219,7 +219,10 @@ export const Livechat: React.FC<LivechatProps> = ({
   configId = "default",
   className = "",
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState<boolean>(() => {
+  if (typeof window === "undefined") return false; 
+  return window.matchMedia("(min-width: 640px)").matches; 
+});
   const [config, setConfig] = useState<ChatbotConfig | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState("");
