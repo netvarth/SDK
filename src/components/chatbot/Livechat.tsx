@@ -680,7 +680,7 @@ const secondary = config.theme.secondaryColor;
                     </Avatar>
                     <div className="bg-[#f2f2f2] rounded-[16px_16px_18.94px_2.1px] p-3 sm:p-4 max-w-[85%] sm:max-w-[22rem]">
                       <p className="text-[#272727] text-[clamp(13px,1.4vw,16px)] leading-[22px] sm:leading-[23px]">
-                        Hi There,<br />How Can I help you today?
+                       👋 Hi there!,Welcome to Jaldee Health.<br />What would you like help with today?
                       </p>
                     </div>
                   </div>

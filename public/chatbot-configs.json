@@ -2,12 +2,12 @@
   "default": {
     "id": "default",
     "name": "J",
-    "greeting": "Hey J!",
-    "subtitle": "You can ask anything About Jaldee!",
+    "greeting": "Hi, I'm J!",
+    "subtitle": "Your assistant for Jaldee Health Solutions",
     "avatar": "🤖",
     "theme": {
-      "primaryColor": "#6B3ACD",
-      "secondaryColor": "#8857E2",
+      "primaryColor": "#2646C4",
+      "secondaryColor": "#5b81fc",
       "position": "bottom-right"
     }
     
