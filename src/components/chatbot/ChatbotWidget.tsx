@@ -27,6 +27,7 @@ interface ChatbotConfig {
   id: string;
   name: string;
   greeting: string;
+  welcomeMessage?: string;
   subtitle: string;
   avatar: string;
   quickActions: QuickAction[];
@@ -159,6 +160,9 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({
   const positionClasses = config.theme.position === 'bottom-right' 
     ? 'bottom-4 right-4' 
     : 'bottom-4 left-4';
+  const welcomeLines = (config.welcomeMessage ?? 'Hi There,\nHow Can I help you today?')
+    .split(/\r?\n/)
+    .filter((line) => line.trim().length > 0);
 
   return (
     <div className={`fixed ${positionClasses} z-50 ${className}`}>
@@ -217,8 +221,12 @@ export const ChatbotWidget: React.FC<ChatbotWidgetProps> = ({
                     </div>
                     <div>
                       <p className="text-sm text-chatbot-text mb-3">
-                        Hi There,<br />
-                        How Can I help you today?
+                        {welcomeLines.map((line, index) => (
+                          <React.Fragment key={`${line}-${index}`}>
+                            {line}
+                            {index < welcomeLines.length - 1 && <br />}
+                          </React.Fragment>
+                        ))}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {config.quickActions.map((action) => (

@@ -3,6 +3,7 @@
     "id": "default",
     "name": "J",
     "greeting": "Hi, I'm J!",
+    "welcomeMessage": "Hi There,\nHow Can I help you today?",
     "subtitle": "Your assistant for Jaldee Health Solutions",
     "avatar": "🤖",
     "theme": {

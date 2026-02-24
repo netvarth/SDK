@@ -66,6 +66,7 @@ interface ChatbotConfig {
   id: string;
   name: string;
   greeting: string;
+  welcomeMessage?: string;
   subtitle: string;
   avatar: string;
   conversations: Record<string, Conversation>;
@@ -496,9 +497,12 @@ export const Livechat: React.FC<LivechatProps> = ({
     if (e.key === "Enter") handleSendMessage();
   };
 
-  if (loading || !config) return null;
+if (loading || !config) return null;
 const primary = config.theme.primaryColor;
 const secondary = config.theme.secondaryColor;
+const welcomeLines = (config.welcomeMessage ?? "Hi There,\nHow Can I help you today?")
+  .split(/\r?\n/)
+  .filter((line) => line.trim().length > 0);
 
   const dockMobile =
     config.theme.position === "bottom-right"
@@ -680,7 +684,12 @@ const secondary = config.theme.secondaryColor;
                     </Avatar>
                     <div className="bg-[#f2f2f2] rounded-[16px_16px_18.94px_2.1px] p-3 sm:p-4 max-w-[85%] sm:max-w-[22rem]">
                       <p className="text-[#272727] text-[clamp(13px,1.4vw,16px)] leading-[22px] sm:leading-[23px]">
-                       👋 Hi there!,Welcome to Jaldee Health.<br />What would you like help with today?
+                        {welcomeLines.map((line, index) => (
+                          <React.Fragment key={`${line}-${index}`}>
+                            {line}
+                            {index < welcomeLines.length - 1 && <br />}
+                          </React.Fragment>
+                        ))}
                       </p>
                     </div>
                   </div>
