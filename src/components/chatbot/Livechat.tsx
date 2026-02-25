@@ -524,7 +524,7 @@ const welcomeLines = (config.welcomeMessage ?? "Hi There,\nHow Can I help you to
     "transition-opacity duration-300 ease-out opacity-0 animate-fade-in [--animation-delay:200ms]";
 
   return (
-    <div className={`fixed ${positionClasses} z-101 ${className}`} style={{zIndex:101}} >
+    <div className={`fixed ${positionClasses} z-101 ${className}`} style={{zIndex:1101}} >
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
@@ -695,7 +695,7 @@ const welcomeLines = (config.welcomeMessage ?? "Hi There,\nHow Can I help you to
                   </div>
 
                   {/* dynamic buttons from JSON */}
-                  <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-3 mb-auto">
+                  <div className="flex flex-wrap gap-3 mb-auto">
                     {jsonActions.map((a) => (
                       <Button
                         key={a.id}
@@ -1027,7 +1027,7 @@ const welcomeLines = (config.welcomeMessage ?? "Hi There,\nHow Can I help you to
           "
         >
           <div className="flex items-center justify-between text-white">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3" onClick={() => setIsMinimized(false)}>
               <Avatar className="w-10 h-10">
                 <AvatarImage src={logoPath} />
                 <AvatarFallback>🤖</AvatarFallback>
