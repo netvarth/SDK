@@ -524,7 +524,7 @@ const welcomeLines = (config.welcomeMessage ?? "Hi There,\nHow Can I help you to
     "transition-opacity duration-300 ease-out opacity-0 animate-fade-in [--animation-delay:200ms]";
 
   return (
-    <div className={`fixed ${positionClasses} z-101 ${className}`} style={{zIndex:1101}} >
+    <div className={`fixed ${positionClasses} z-101 ${className}`} style={{zIndex:11101}} >
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
